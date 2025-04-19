@@ -21,10 +21,8 @@ python manage.py collectstatic --no-input --settings=foodsite.settings_render
 # Apply database migrations
 python manage.py migrate --settings=foodsite.settings_render
 
-# Create superuser if environment variables are set
-if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
-    python manage.py createsuperuser --noinput --settings=foodsite.settings_render
-fi
+# Create superuser directly with hardcoded credentials
+echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username='baihelahusain').exists() or User.objects.create_superuser('baihelahusain', 'baihelahusain@gmail.com', 'bah@7865354')" | python manage.py shell --settings=foodsite.settings_render
 
 # Start gunicorn server with Render-specific settings
 gunicorn foodsite.wsgi:application --env DJANGO_SETTINGS_MODULE=foodsite.settings_render 
