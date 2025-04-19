@@ -3,11 +3,17 @@
 # Exit on error
 set -o errexit
 
+# Print each command for debugging
+set -o xtrace
+
 # Install dependencies
 pip install -r requirements.txt
 
-# Explicitly install django-cors-headers
-pip install django-cors-headers
+# Explicitly install required packages
+pip install django-cors-headers whitenoise dj-database-url
+
+# Create staticfiles directory if it doesn't exist
+mkdir -p staticfiles
 
 # Collect static files
 python manage.py collectstatic --no-input --settings=foodsite.settings_render
