@@ -52,13 +52,28 @@ if DATABASE_URL:
         # For using with Supabase, need to disable prepared statements
         db_config = dj_database_url.parse(DATABASE_URL)
         
-        # Make sure SSL is properly configured
-        db_config['OPTIONS'] = {
-            'sslmode': 'require',
-        }
+        # Check if using connection pooler
+        is_pooler = 'pooler.supabase.com' in db_config.get('HOST', '')
         
-        # Don't keep connections open too long
-        db_config['CONN_MAX_AGE'] = 0
+        # Configure based on connection type
+        if is_pooler:
+            print("Using Supabase connection pooler (IPv4 compatible)")
+            # For pooler, need these specific settings
+            db_config['OPTIONS'] = {
+                'sslmode': 'require',
+            }
+            # For transaction pooler mode, disable prepared statements
+            if ':6543/' in DATABASE_URL:
+                print("Using transaction pooler mode - disabling prepared statements")
+                db_config['OPTIONS']['options'] = '-c statement_timeout=30000 -c idle_in_transaction_session_timeout=30000'
+                db_config['DISABLE_SERVER_SIDE_CURSORS'] = True
+                db_config['CONN_MAX_AGE'] = 0
+        else:
+            # Direct connection settings
+            print("Using direct database connection (requires IPv6)")
+            db_config['OPTIONS'] = {
+                'sslmode': 'require',
+            }
         
         # Add connection health checks
         db_config['CONN_HEALTH_CHECKS'] = True
@@ -67,15 +82,7 @@ if DATABASE_URL:
             'default': db_config
         }
         
-        # Test the connection
-        try:
-            import psycopg2
-            conn = psycopg2.connect(DATABASE_URL)
-            conn.close()
-            print("✅ Successfully tested direct connection to PostgreSQL")
-        except Exception as e:
-            print(f"⚠️ Direct connection test failed: {e}")
-        
+        # Print configuration for debugging
         print(f"Database config: HOST={db_config.get('HOST')}, NAME={db_config.get('NAME')}, ENGINE={db_config.get('ENGINE')}")
     except Exception as e:
         print(f"❌ Error configuring PostgreSQL: {e}")

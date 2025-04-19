@@ -10,7 +10,6 @@ set -o xtrace
 echo "Environment variables check:"
 echo "DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-Not set}"
 echo "DATABASE_URL: ${DATABASE_URL:+Set (value hidden)}"
-echo "DATABASE_URL: ${DATABASE_URL:-Not set}"
 echo "RENDER: ${RENDER:-Not set}"
 
 # First install django-cors-headers explicitly (before other deps)
@@ -29,11 +28,23 @@ mkdir -p staticfiles
 if [ -n "$DATABASE_URL" ]; then
   MASKED_URL=$(echo $DATABASE_URL | sed 's/postgres:\/\/[^:]*:[^@]*@/postgres:\/\/username:***@/')
   echo "Using database: $MASKED_URL"
+  
+  # Check if using db.jbpywpsfcnmygemtwtvz.supabase.co (direct connection)
+  if [[ "$DATABASE_URL" == *"db.jbpywpsfcnmygemtwtvz.supabase.co"* ]]; then
+    echo "Using direct connection URL. If this fails, will try connection pooler."
+    
+    # Try to test connection
+    python test_db.py || {
+      echo "Direct connection failed! Switching to connection pooler..."
+      export DATABASE_URL="postgresql://postgres.jbpywpsfcnmygemtwtvz:bah%407865354@aws-0-us-west-1.pooler.supabase.com:6543/postgres?schema=public"
+      echo "Now using pooler URL: $(echo $DATABASE_URL | sed 's/postgres:\/\/[^:]*:[^@]*@/postgres:\/\/username:***@/')"
+    }
+  fi
 else
   echo "WARNING: DATABASE_URL is not set!"
-  # Set a default DATABASE_URL for testing
-  export DATABASE_URL="postgresql://postgres:bah%407865354@db.jbpywpsfcnmygemtwtvz.supabase.co:5432/postgres?sslmode=require"
-  echo "Setting default DATABASE_URL to Supabase for testing"
+  # Set a default DATABASE_URL using the connection pooler
+  export DATABASE_URL="postgresql://postgres.jbpywpsfcnmygemtwtvz:bah%407865354@aws-0-us-west-1.pooler.supabase.com:6543/postgres?schema=public"
+  echo "Setting default DATABASE_URL to Supabase connection pooler"
 fi
 
 # Test database connection before proceeding
