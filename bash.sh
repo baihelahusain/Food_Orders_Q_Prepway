@@ -15,6 +15,10 @@ pip install django-cors-headers whitenoise dj-database-url psycopg2-binary
 # Create staticfiles directory if it doesn't exist
 mkdir -p staticfiles
 
+# Print database URL (hiding password)
+DATABASE_URL=$(echo $DATABASE_URL | sed 's/postgres:\/\/[^:]*:[^@]*@/postgres:\/\/username:***@/')
+echo "Using database: $DATABASE_URL"
+
 # Create a database test script
 cat > test_db.py << EOF
 import os
