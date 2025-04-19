@@ -6,11 +6,11 @@ set -o errexit
 # Print each command for debugging
 set -o xtrace
 
-# Install dependencies
-pip install -r requirements.txt
+# Install requirements for Render specifically
+pip install -r requirements-render.txt
 
 # Explicitly install required packages
-pip install django-cors-headers whitenoise dj-database-url psycopg2-binary
+pip install django-cors-headers==4.2.0 whitenoise dj-database-url psycopg2-binary
 
 # Create staticfiles directory if it doesn't exist
 mkdir -p staticfiles
