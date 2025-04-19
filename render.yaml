@@ -17,7 +17,7 @@ services:
       - key: SUPABASE_KEY
         value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpicHl3cHNmY25teWdlbXR3dHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwNTAwNzIsImV4cCI6MjA2MDYyNjA3Mn0.Pjpoum8Gn5NLNVq9YjwHzG5OSlhd0yJqWaJavsv7vU4"
       - key: DATABASE_URL
-        value: "postgres://postgres:bah%407865354@db.jbpywpsfcnmygemtwtvz.supabase.co:5432/postgres"
+        value: "postgresql://postgres:bah%407865354@db.jbpywpsfcnmygemtwtvz.supabase.co:5432/postgres?sslmode=require"
       - key: PYTHON_VERSION
         value: "3.10.0"
       - key: DJANGO_SUPERUSER_USERNAME

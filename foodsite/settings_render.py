@@ -35,19 +35,29 @@ os.makedirs(STATIC_ROOT, exist_ok=True)
 # Database settings for Supabase PostgreSQL
 import dj_database_url
 DATABASE_URL = os.environ.get('DATABASE_URL')
+
+print(f"DATABASE_URL in settings: {'Set' if DATABASE_URL else 'Not set'}")
+
 if DATABASE_URL:
     # For using with Supabase, need to disable prepared statements
     db_config = dj_database_url.parse(DATABASE_URL)
+    
+    # Make sure SSL is properly configured
     db_config['OPTIONS'] = {
-        'options': '-c statement_timeout=60000',
         'sslmode': 'require',
     }
-    db_config['CONN_MAX_AGE'] = 0  # Use 0 for pooler mode transaction
+    
+    # Don't keep connections open too long
+    db_config['CONN_MAX_AGE'] = 0
+    
+    # Add connection health checks
     db_config['CONN_HEALTH_CHECKS'] = True
+    
     DATABASES = {
         'default': db_config
     }
-    print(f"Connected to database: {db_config['HOST']} ({db_config['NAME']})")
+    
+    print(f"Database config: HOST={db_config.get('HOST')}, NAME={db_config.get('NAME')}, ENGINE={db_config.get('ENGINE')}")
 else:
     print("WARNING: No DATABASE_URL found. Using SQLite database.")
     # Fall back to SQLite for local development

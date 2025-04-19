@@ -28,12 +28,10 @@ def test_connection():
         # Open a cursor to perform database operations
         cur = conn.cursor()
         
-        # Execute a test query
-        cur.execute("SELECT version();")
-        
-        # Get the database version
-        db_version = cur.fetchone()
-        print(f"PostgreSQL database version: {db_version[0]}")
+        # Execute a basic test query that works on any PostgreSQL database
+        cur.execute("SELECT 1;")
+        result = cur.fetchone()[0]
+        print(f"Test query result: {result}")
         
         # Check existing tables
         cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
