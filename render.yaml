@@ -11,7 +11,7 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: ".onrender.com"
+        value: ".onrender.com,food-orders-q-prepway.onrender.com"
       - key: SUPABASE_URL
         value: "https://jbpywpsfcnmygemtwtvz.supabase.co"
       - key: SUPABASE_KEY
