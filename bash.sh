@@ -6,16 +6,19 @@ set -o errexit
 # Install dependencies
 pip install -r requirements.txt
 
+# Explicitly install django-cors-headers
+pip install django-cors-headers
+
 # Collect static files
-python manage.py collectstatic --no-input
+python manage.py collectstatic --no-input --settings=foodsite.settings_render
 
 # Apply database migrations
-python manage.py migrate
+python manage.py migrate --settings=foodsite.settings_render
 
 # Create superuser if environment variables are set
 if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
-    python manage.py createsuperuser --noinput
+    python manage.py createsuperuser --noinput --settings=foodsite.settings_render
 fi
 
-# Start gunicorn server
-gunicorn foodsite.wsgi:application 
+# Start gunicorn server with Render-specific settings
+gunicorn foodsite.wsgi:application --env DJANGO_SETTINGS_MODULE=foodsite.settings_render 

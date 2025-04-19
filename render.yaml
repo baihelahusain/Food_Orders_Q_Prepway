@@ -24,4 +24,6 @@ services:
         value: "baihelahusain@gmail.com"
       - key: DJANGO_SUPERUSER_PASSWORD
         value: "bah@7865354"
+      - key: RENDER
+        value: "True"
     autoDeploy: true 
