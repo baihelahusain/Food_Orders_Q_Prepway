@@ -1,0 +1,190 @@
+{% extends 'food/base.html' %}
+{% load food_extras %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Order Confirmed!</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                        <h4 class="mt-3">Thank you for your order, {{ order.user.username }}!</h4>
+                        <p class="text-muted">Your order #{{ order.id }} has been successfully placed.</p>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Order Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Order ID:</strong> #{{ order.id }}</p>
+                                    <p><strong>Date:</strong> {{ order.created_at|date:"F j, Y, g:i a" }}</p>
+                                    <p>
+                                        <strong>Status:</strong> 
+                                        {% if order.status == 'pending' %}
+                                            <span class="badge bg-warning">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'confirmed' %}
+                                            <span class="badge bg-info">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'delivered' %}
+                                            <span class="badge bg-success">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'cancelled' %}
+                                            <span class="badge bg-danger">{{ order.get_status_display }}</span>
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Total Amount:</strong> ₹{{ order.total_price }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Contact Number:</strong> {{ order.contact_number|default:"Not provided" }}</p>
+                                    <p><strong>Delivery Location:</strong> {{ order.delivery_location|default:"Not provided" }}</p>
+                                    {% if order.estimated_delivery_time %}
+                                    <div class="bg-light rounded p-2 text-center mt-3">
+                                        <small class="text-muted d-block">Estimated Delivery Time:</small>
+                                        <div id="customer-timer" class="fs-5 fw-bold text-success" data-minutes="{{ order.estimated_delivery_time }}">
+                                            {{ order.estimated_delivery_time }} min
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <p><strong>Estimated Delivery:</strong> <span class="text-muted">Not set yet</span></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if order.latitude and order.longitude %}
+                            <div class="mt-4">
+                                <h6 class="mb-2">Your Delivery Location</h6>
+                                <div id="customer-map" style="height: 200px; border-radius: 8px; border: 1px solid #ddd;"></div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Order Items</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Quantity</th>
+                                            <th>Prep Time</th>
+                                            <th>Price</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in order_items %}
+                                        <tr>
+                                            <td>{{ item.item.Item_name }}</td>
+                                            <td>{{ item.quantity }}</td>
+                                            <td>{{ item.item.prep_time|default:"N/A" }}</td>
+                                            <td>₹{{ item.price }}</td>
+                                            <td>₹{{ item.quantity|floatformat:0|multiply:item.price }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="4" class="text-end fw-bold">Order Total:</td>
+                                            <td class="fw-bold">₹{{ order.total_price }}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'food:index' %}" class="btn btn-primary">
+                            <i class="fas fa-utensils me-2"></i>Continue Shopping
+                        </a>
+                        <a href="{% url 'food:order_history' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-history me-2"></i>View Order History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if order.latitude and order.longitude %}
+<!-- Google Maps for customer location -->
+<script>
+    function initCustomerMap() {
+        try {
+            const deliveryLocation = {
+                lat: parseFloat('{{ order.latitude }}'),
+                lng: parseFloat('{{ order.longitude }}')
+            };
+            
+            // Create a map centered at customer's location
+            const map = new google.maps.Map(document.getElementById("customer-map"), {
+                zoom: 15,
+                center: deliveryLocation,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false
+            });
+            
+            // Add marker for customer location
+            const marker = new google.maps.Marker({
+                position: deliveryLocation,
+                map: map,
+                title: "Your Location"
+            });
+            
+            // Add a circle to show delivery area
+            new google.maps.Circle({
+                strokeColor: "#28a745",
+                strokeOpacity: 0.3,
+                strokeWeight: 2,
+                fillColor: "#28a745",
+                fillOpacity: 0.1,
+                map: map,
+                center: deliveryLocation,
+                radius: 200
+            });
+            
+            // Setup countdown timer if estimated time is set
+            const timerElement = document.getElementById("customer-timer");
+            if (timerElement) {
+                const minutes = parseInt(timerElement.getAttribute("data-minutes"));
+                if (!isNaN(minutes) && minutes > 0) {
+                    let totalSeconds = minutes * 60;
+                    const timerInterval = setInterval(() => {
+                        if (totalSeconds <= 0) {
+                            clearInterval(timerInterval);
+                            timerElement.innerHTML = "Delivery time reached!";
+                            timerElement.classList.remove("text-success");
+                            timerElement.classList.add("text-danger");
+                            return;
+                        }
+                        
+                        const remainingMinutes = Math.floor(totalSeconds / 60);
+                        const remainingSeconds = totalSeconds % 60;
+                        timerElement.innerHTML = `${remainingMinutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+                        
+                        totalSeconds--;
+                    }, 1000);
+                }
+            }
+            
+        } catch (e) {
+            console.error("Error initializing customer map:", e);
+            document.getElementById("customer-map").innerHTML = 
+                '<div class="alert alert-warning text-center">Unable to load map.</div>';
+        }
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA0s1a7phLN0iaD6-UE7m4qP-z21pH0eSc&callback=initCustomerMap" async defer></script>
+{% endif %}
+{% endblock %}

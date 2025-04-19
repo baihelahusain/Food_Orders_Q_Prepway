@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8f8f8"/>
+  
+  <!-- Plate -->
+  <circle cx="400" cy="350" r="150" fill="#ffffff" stroke="#e0e0e0" stroke-width="5"/>
+  
+  <!-- Food items on plate -->
+  <g>
+    <!-- Main dish -->
+    <ellipse cx="400" cy="340" rx="100" ry="80" fill="#f0c057"/>
+    <ellipse cx="400" cy="330" rx="70" ry="50" fill="#e8b54d"/>
+    
+    <!-- Vegetables -->
+    <circle cx="330" cy="300" r="20" fill="#8bc34a"/>
+    <circle cx="470" cy="300" r="18" fill="#4caf50"/>
+    <circle cx="435" cy="280" r="15" fill="#ff5722"/>
+    <circle cx="370" cy="290" r="17" fill="#e91e63"/>
+    
+    <!-- Garnish -->
+    <path d="M350,270 Q400,240 450,270" fill="transparent" stroke="#00897b" stroke-width="3"/>
+    <path d="M370,250 L380,230 M400,240 L400,220 M420,250 L430,230" stroke="#00897b" stroke-width="2"/>
+  </g>
+  
+  <!-- Fork and Knife -->
+  <g transform="rotate(-30, 250, 350)">
+    <rect x="240" y="250" width="10" height="200" rx="5" fill="#a0a0a0"/>
+    <path d="M240,250 L250,250 L255,200 L235,200 Z" fill="#909090"/>
+  </g>
+  
+  <g transform="rotate(30, 550, 350)">
+    <rect x="545" y="250" width="10" height="200" rx="5" fill="#a0a0a0"/>
+    <path d="M530,250 C540,220 560,220 570,250" fill="transparent" stroke="#a0a0a0" stroke-width="10"/>
+  </g>
+  
+  <!-- Food delivery icons -->
+  <g transform="translate(150, 150)">
+    <circle cx="0" cy="0" r="50" fill="#f44336" opacity="0.8"/>
+    <path d="M-25,-10 L25,-10 L0,20 Z" fill="white"/>
+    <circle cx="0" cy="0" r="15" fill="white"/>
+  </g>
+  
+  <g transform="translate(650, 150)">
+    <circle cx="0" cy="0" r="50" fill="#2196f3" opacity="0.8"/>
+    <rect x="-20" y="-15" width="40" height="30" rx="5" fill="white"/>
+    <path d="M-15,15 L15,15 L5,25 L-5,25 Z" fill="white"/>
+  </g>
+  
+  <!-- Abstract decorative elements -->
+  <path d="M0,100 Q200,150 400,100 Q600,50 800,100" fill="transparent" stroke="#ff9800" stroke-width="5" opacity="0.3"/>
+  <path d="M0,500 Q200,450 400,500 Q600,550 800,500" fill="transparent" stroke="#3f51b5" stroke-width="5" opacity="0.3"/>
+</svg> 

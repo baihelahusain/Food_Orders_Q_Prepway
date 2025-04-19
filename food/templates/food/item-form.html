@@ -1,0 +1,140 @@
+{% extends 'food/base.html'%}
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{% if form.instance.id %}Edit{% else %}Add New{% endif %} Food Item</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.Item_name.id_for_label }}" class="form-label">{{ form.Item_name.label }}</label>
+                            {{ form.Item_name }}
+                            {% if form.Item_name.help_text %}
+                                <small class="form-text text-muted">{{ form.Item_name.help_text }}</small>
+                            {% endif %}
+                            {% if form.Item_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.Item_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.Item_desc.id_for_label }}" class="form-label">{{ form.Item_desc.label }}</label>
+                            {{ form.Item_desc }}
+                            {% if form.Item_desc.help_text %}
+                                <small class="form-text text-muted">{{ form.Item_desc.help_text }}</small>
+                            {% endif %}
+                            {% if form.Item_desc.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.Item_desc.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.Item_price.id_for_label }}" class="form-label">{{ form.Item_price.label }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                {{ form.Item_price }}
+                            </div>
+                            {% if form.Item_price.help_text %}
+                                <small class="form-text text-muted">{{ form.Item_price.help_text }}</small>
+                            {% endif %}
+                            {% if form.Item_price.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.Item_price.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.Item_img.id_for_label }}" class="form-label">{{ form.Item_img.label }}</label>
+                            {{ form.Item_img }}
+                            {% if form.Item_img.help_text %}
+                                <small class="form-text text-muted">{{ form.Item_img.help_text }}</small>
+                            {% endif %}
+                            {% if form.Item_img.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.Item_img.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.item_image.id_for_label }}" class="form-label">{{ form.item_image.label }}</label>
+                            {{ form.item_image }}
+                            {% if form.item_image.help_text %}
+                                <small class="form-text text-muted">{{ form.item_image.help_text }}</small>
+                            {% endif %}
+                            {% if form.item_image.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.item_image.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if form.instance.item_image %}
+                                <div class="mt-2">
+                                    <p>Current image:</p>
+                                    <img src="{{ form.instance.item_image.url }}" alt="Current image" class="img-thumbnail" style="max-height: 150px;">
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.prep_time.id_for_label }}" class="form-label">{{ form.prep_time.label }}</label>
+                            {{ form.prep_time }}
+                            {% if form.prep_time.help_text %}
+                                <small class="form-text text-muted">{{ form.prep_time.help_text }}</small>
+                            {% endif %}
+                            {% if form.prep_time.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.prep_time.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                            {{ form.category }}
+                            {% if form.category.help_text %}
+                                <small class="form-text text-muted">{{ form.category.help_text }}</small>
+                            {% endif %}
+                            {% if form.category.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.category.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'food:index' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-save me-2"></i>Save Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends 'food/base.html' %}
+
+{% block body %}
+<div class="container">
+    <h2 class="mb-4">Checkout</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cart_item in cart_items %}
+                                <tr>
+                                    <td>
+                                        {% if cart_item.item.item_image %}
+                                            <img src="{{ cart_item.item.item_image.url }}" alt="{{ cart_item.item.Item_name }}" class="img-thumbnail me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                            <img src="{{ cart_item.item.Item_img }}" alt="{{ cart_item.item.Item_name }}" class="img-thumbnail me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% endif %}
+                                        {{ cart_item.item.Item_name }}
+                                        {% if cart_item.item.prep_time %}
+                                            <small class="text-muted d-block">Prep time: {{ cart_item.item.prep_time }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ cart_item.quantity }}</td>
+                                    <td>₹{{ cart_item.item.Item_price }}</td>
+                                    <td>₹{{ cart_item.total_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end fw-bold">Order Total:</td>
+                                    <td class="fw-bold">₹{{ total }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Delivery Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <p class="form-control-plaintext">{{ user.get_full_name|default:user.username }}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <p class="form-control-plaintext">{{ user.email }}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contact_number" class="form-label">Contact Number *</label>
+                            <input type="tel" class="form-control" id="contact_number" name="contact_number" placeholder="Enter your phone number" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Delivery Address *</label>
+                            <textarea class="form-control" id="address" name="delivery_location" rows="3" required>{{ user.profile.location }}</textarea>
+                        </div>
+                        
+                        <!-- Map Location Picker -->
+                        <div class="mb-3">
+                            <label class="form-label">Or Select Location on Map</label>
+                            <div id="map-container" style="height: 200px; border-radius: 4px; border: 1px solid #ccc;">
+                                <div id="location-map" style="height: 100%;"></div>
+                            </div>
+                            <input type="hidden" id="location-latitude" name="latitude">
+                            <input type="hidden" id="location-longitude" name="longitude">
+                            <small class="text-muted">Click on the map to select your location</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="payment" class="form-label">Payment Method *</label>
+                            <select class="form-select" id="payment" name="payment_method" required>
+                                <option value="cod">Cash on Delivery</option>
+                                <option value="online">Online Payment</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check-circle me-2"></i>Place Order
+                            </button>
+                            <a href="{% url 'food:view_cart' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Cart
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Google Maps JavaScript -->
+<script>
+    function initMap() {
+        // Check if map element exists
+        const mapElement = document.getElementById("location-map");
+        if (!mapElement) return;
+        
+        // Default location (India)
+        const defaultLocation = { lat: 20.5937, lng: 78.9629 };
+        
+        try {
+            // Create map
+            const map = new google.maps.Map(mapElement, {
+                zoom: 5,
+                center: defaultLocation,
+            });
+            
+            // Create marker
+            let marker = new google.maps.Marker({
+                position: defaultLocation,
+                map: map,
+                draggable: true
+            });
+            
+            // Update form fields when marker is moved
+            google.maps.event.addListener(marker, 'dragend', function() {
+                document.getElementById('location-latitude').value = marker.getPosition().lat();
+                document.getElementById('location-longitude').value = marker.getPosition().lng();
+            });
+            
+            // Set marker on map click
+            google.maps.event.addListener(map, 'click', function(event) {
+                marker.setPosition(event.latLng);
+                document.getElementById('location-latitude').value = event.latLng.lat();
+                document.getElementById('location-longitude').value = event.latLng.lng();
+            });
+            
+            // Try to get user's current location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+                        
+                        // Set map center and marker to user's location
+                        map.setCenter(userLocation);
+                        map.setZoom(15);
+                        marker.setPosition(userLocation);
+                        
+                        // Update form fields
+                        document.getElementById('location-latitude').value = userLocation.lat;
+                        document.getElementById('location-longitude').value = userLocation.lng;
+                    },
+                    () => {
+                        // If geolocation fails, use default location
+                        console.log("Geolocation failed or was denied");
+                    }
+                );
+            }
+        } catch (e) {
+            console.error("Error initializing map:", e);
+            document.getElementById('map-container').innerHTML = '<div class="alert alert-warning">Unable to load map. Please enter your address manually.</div>';
+        }
+    }
+</script>
+
+<!-- Replace YOUR_API_KEY with a valid Google Maps API key -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA0s1a7phLN0iaD6-UE7m4qP-z21pH0eSc&callback=initMap" async defer onerror="document.getElementById('map-container').innerHTML = '<div class=\"alert alert-warning\">Maps could not be loaded. Please enter your address manually.</div>'"></script>
+{% endblock %}

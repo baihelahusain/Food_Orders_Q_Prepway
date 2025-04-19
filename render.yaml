@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: food-order-app
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash bash.sh
+    healthCheckPath: /
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: SUPABASE_URL
+        value: "https://jbpywpsfcnmygemtwtvz.supabase.co"
+      - key: SUPABASE_KEY
+        value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpicHl3cHNmY25teWdlbXR3dHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwNTAwNzIsImV4cCI6MjA2MDYyNjA3Mn0.Pjpoum8Gn5NLNVq9YjwHzG5OSlhd0yJqWaJavsv7vU4"
+      - key: PYTHON_VERSION
+        value: "3.10.0"
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: "baihelahusain"
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: "baihelahusain@gmail.com"
+      - key: DJANGO_SUPERUSER_PASSWORD
+        value: "bah@7865354"
+    autoDeploy: true 

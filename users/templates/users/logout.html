@@ -1,0 +1,16 @@
+{% extends 'food/base.html' %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="alert alert-success">
+                <h2>You Have Successfully Logged Out</h2>
+                <p>Thank you for using our site.</p>
+            </div>
+            <p><a href="{% url 'login' %}" class="btn btn-primary">Log In Again</a></p>
+            <p><a href="{% url 'food:index' %}" class="btn btn-outline-secondary">Return to Home</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

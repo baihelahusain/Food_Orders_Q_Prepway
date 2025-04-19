@@ -1,0 +1,166 @@
+{% extends 'food/base.html' %}
+{% load food_extras %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food App</title>
+    <style>
+        .category-nav {
+            padding: 15px 0;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .category-nav .nav-link {
+            color: #343a40;
+            font-weight: 500;
+            padding: 8px 15px;
+            margin: 0 5px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        .category-nav .nav-link.active {
+            background-color: #28a745;
+            color: white;
+        }
+        .category-nav .nav-link:hover {
+            background-color: #e9ecef;
+        }
+        .category-header {
+            padding: 10px 15px;
+            margin: 20px 0 10px 0;
+            background-color: #f8f9fa;
+            border-left: 5px solid #28a745;
+            border-radius: 0 5px 5px 0;
+        }
+        .food-card {
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+        }
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    {% block body %}
+    
+    <!-- Category Navigation -->
+    <div class="container mt-4">
+        <div class="category-nav">
+            <ul class="nav nav-pills justify-content-center">
+                <li class="nav-item">
+                    <a class="nav-link {% if not selected_category %}active{% endif %}" href="{% url 'food:index' %}">All</a>
+                </li>
+                {% for cat_key, cat_name in categories.items %}
+                <li class="nav-item">
+                    <a class="nav-link {% if selected_category == cat_key %}active{% endif %}" 
+                       href="{% url 'food:index' %}?category={{ cat_key }}">{{ cat_name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Display by Categories -->
+    <div class="container">
+        {% if selected_category %}
+            <h2 class="category-header">{{ categories|get_item:selected_category }}</h2>
+            <div class="row">
+            {% for item in item_list %}
+                <div class="col-md-4 mb-4">
+                    <div class="card food-card h-100">
+                        {% if item.item_image %}
+                            <img src="{{ item.item_image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ item.Item_name }}">
+                        {% else %}
+                            <img src="{{ item.Item_img }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ item.Item_name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.Item_name }}</h5>
+                            <p class="card-text">{{ item.Item_desc|truncatechars:100 }}</p>
+                            <p class="text-success fw-bold">₹{{ item.Item_price }}</p>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'food:detail' item.id %}" class="btn btn-outline-success">View Details</a>
+                                {% if user.is_authenticated and not user.is_superuser %}
+                                <a href="{% url 'food:add_to_cart' item.id %}" class="btn btn-primary">
+                                    <i class="fas fa-cart-plus"></i> Add to Cart
+                                </a>
+                                {% endif %}
+                                {% if user.is_superuser %}
+                                <div class="btn-group mt-2" role="group">
+                                    <a href="{% url 'food:update_item' item.id %}" class="btn btn-warning">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="{% url 'food:delete_item' item.id %}" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5">
+                    <div class="alert alert-info">
+                        <h4><i class="fas fa-info-circle me-2"></i>No items found in this category</h4>
+                        <p>Try selecting a different category or check back later.</p>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        {% else %}
+            {% for cat_key, cat_data in categorized_items.items %}
+                <h2 class="category-header">{{ cat_data.name }}</h2>
+                <div class="row">
+                {% for item in cat_data.items|slice:":3" %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card food-card h-100">
+                            {% if item.item_image %}
+                                <img src="{{ item.item_image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ item.Item_name }}">
+                            {% else %}
+                                <img src="{{ item.Item_img }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ item.Item_name }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.Item_name }}</h5>
+                                <p class="card-text">{{ item.Item_desc|truncatechars:100 }}</p>
+                                <p class="text-success fw-bold">₹{{ item.Item_price }}</p>
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'food:detail' item.id %}" class="btn btn-outline-success">View Details</a>
+                                    {% if user.is_authenticated and not user.is_superuser %}
+                                    <a href="{% url 'food:add_to_cart' item.id %}" class="btn btn-primary">
+                                        <i class="fas fa-cart-plus"></i> Add to Cart
+                                    </a>
+                                    {% endif %}
+                                    {% if user.is_superuser %}
+                                    <div class="btn-group mt-2" role="group">
+                                        <a href="{% url 'food:update_item' item.id %}" class="btn btn-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'food:delete_item' item.id %}" class="btn btn-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+                <div class="text-end mb-4">
+                    <a href="{% url 'food:index' %}?category={{ cat_key }}" class="btn btn-outline-secondary">
+                        View All {{ cat_data.name }}
+                    </a>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {% endblock %}
+</body>
+</html>

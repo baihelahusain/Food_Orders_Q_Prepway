@@ -1,0 +1,183 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'food/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <title>Food Orders Q - Premium Food Delivery</title>
+    <meta name="description" content="Food Orders Q - Fast and reliable food delivery service with a wide variety of cuisines.">
+</head>
+<body>
+    <!-- Navbar with shadow -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+        <div class="container">
+            <a href="{% url 'food:index' %}" class="navbar-brand d-flex align-items-center">
+                <i class="fas fa-utensils me-2"></i>
+                <span class="fw-bold">Food Orders Q</span>
+            </a>
+            
+            <!-- Hamburger menu for mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Nav links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'food:index' %}"><i class="fas fa-book-open me-1"></i> Menu</a>
+                    </li>
+                    {% if user.is_superuser %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/food/add/"><i class="fas fa-plus-circle me-1"></i> Add Item</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/food/all-orders/"><i class="fas fa-list-alt me-1"></i> All Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/"><i class="fas fa-cog me-1"></i> Admin Panel</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated %}
+                        {% if not user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'food:view_cart' %}">
+                                <i class="fas fa-shopping-cart me-1"></i> Cart
+                                {% with cart_count=user.cart_set.count %}
+                                {% if cart_count > 0 %}
+                                <span class="badge bg-danger rounded-pill">{{ cart_count }}</span>
+                                {% endif %}
+                                {% endwith %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'food:order_history' %}"><i class="fas fa-history me-1"></i> My Orders</a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link text-light" href="{% url 'profile' %}"><i class="fas fa-user-circle me-1"></i> {{ user.username }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link nav-link"><i class="fas fa-sign-out-alt me-1"></i> Logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-sm btn-outline-light ms-2 px-3 rounded-pill" href="{% url 'register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <div class="container">
+                    <i class="fas fa-info-circle me-2"></i>{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- Optional Hero Section (only on index page) -->
+    {% if request.path == '/food/' or request.path == '/' %}
+    <div class="hero-section py-5 bg-dark text-white mb-4">
+        <div class="container py-4">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-3">Delicious Food Delivered To Your Door</h1>
+                    <p class="lead mb-4">Experience a wide variety of cuisines from the comfort of your home with our quick and reliable delivery service.</p>
+                    {% if user.is_authenticated and user.is_superuser %}
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="/food/add/" class="btn btn-primary btn-lg rounded-pill px-4"><i class="fas fa-plus-circle me-2"></i> Add New Item</a>
+                        <a href="/food/all-orders/" class="btn btn-outline-light btn-lg rounded-pill px-4"><i class="fas fa-list-alt me-2"></i> Manage Orders</a>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'food:index' %}" class="btn btn-primary btn-lg rounded-pill px-4">Order Now <i class="fas fa-arrow-right ms-2"></i></a>
+                    {% endif %}
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <img src="{% static 'food/hero-image.svg' %}" alt="Delicious food" class="img-fluid rounded-3 shadow">
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="container mt-4">
+        {% block body %}
+        {% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white mt-5 py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="mb-3 fw-bold">Food Orders Q</h5>
+                    <p class="text-muted">Bringing delicious food right to your doorstep with quick and reliable service. We partner with the best restaurants to bring you a diverse culinary experience.</p>
+                    <div class="d-flex mt-4">
+                        <a href="https://github.com/baihelahusain" target="_blank" class="me-3 text-light social-icon"><i class="fab fa-github fa-lg"></i></a>
+                        <a href="https://www.linkedin.com/in/baihela-hussain/" target="_blank" class="me-3 text-light social-icon"><i class="fab fa-linkedin fa-lg"></i></a>
+                        <a href="mailto:baihelahusain@gmail.com" class="text-light social-icon"><i class="fas fa-envelope fa-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="mb-3 fw-bold">Quick Links</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li class="mb-2"><a href="{% url 'food:index' %}" class="text-decoration-none text-light"><i class="fas fa-chevron-right me-1 small"></i> Menu</a></li>
+                        {% if user.is_authenticated %}
+                            {% if user.is_superuser %}
+                                <li class="mb-2"><a href="/food/add/" class="text-decoration-none text-light"><i class="fas fa-chevron-right me-1 small"></i> Add New Item</a></li>
+                                <li class="mb-2"><a href="/food/all-orders/" class="text-decoration-none text-light"><i class="fas fa-chevron-right me-1 small"></i> All Orders</a></li>
+                            {% else %}
+                                <li class="mb-2"><a href="{% url 'food:view_cart' %}" class="text-decoration-none text-light"><i class="fas fa-chevron-right me-1 small"></i> Cart</a></li>
+                                <li class="mb-2"><a href="{% url 'food:order_history' %}" class="text-decoration-none text-light"><i class="fas fa-chevron-right me-1 small"></i> Order History</a></li>
+                            {% endif %}
+                        {% else %}
+                            <li class="mb-2"><a href="{% url 'login' %}" class="text-decoration-none text-light"><i class="fas fa-chevron-right me-1 small"></i> Login</a></li>
+                            <li class="mb-2"><a href="{% url 'register' %}" class="text-decoration-none text-light"><i class="fas fa-chevron-right me-1 small"></i> Register</a></li>
+                        {% endif %}
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-light"><i class="fas fa-chevron-right me-1 small"></i> About Us</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-light"><i class="fas fa-chevron-right me-1 small"></i> Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="mb-3 fw-bold">Connect With Me</h5>
+                    <p><i class="fas fa-envelope me-2"></i> Email: <a href="mailto:baihelahusain@gmail.com" class="text-decoration-none text-light">baihelahusain@gmail.com</a></p>
+                    <p><i class="fab fa-github me-2"></i> GitHub: <a href="https://github.com/baihelahusain" target="_blank" class="text-decoration-none text-light">@baihelahusain</a></p>
+                    <p><i class="fab fa-linkedin me-2"></i> LinkedIn: <a href="https://www.linkedin.com/in/baihela-hussain/" target="_blank" class="text-decoration-none text-light">Baihela Hussain</a></p>
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-2">We Accept</h6>
+                        <div class="payment-methods">
+                            <i class="fab fa-cc-visa fa-2x me-2"></i>
+                            <i class="fab fa-cc-mastercard fa-2x me-2"></i>
+                            <i class="fab fa-cc-paypal fa-2x me-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-4">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 Food Orders Q. Created by Baihela Hussain. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

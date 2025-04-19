@@ -1,0 +1,8 @@
+{% extends 'food/base.html' %}
+{% block body %}
+<form method="POST" action="{% url 'food:delete_item' item.id %}">
+    {% csrf_token %}
+    <h3>Are you sure you want to delete "{{ item.item.name }}"?</h3>
+    <button type="submit">Confirm</button>
+</form>
+{% endblock %}

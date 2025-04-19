@@ -1,0 +1,70 @@
+{% extends 'food/base.html' %}
+
+{% block body %}
+<div class="container">
+    <h2 class="mb-4">All Orders</h2>
+    
+    {% if orders %}
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Username</th>
+                                <th>Date</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>#{{ order.id }}</td>
+                                <td><strong>{{ order.user.username }}</strong></td>
+                                <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                <td>{{ order.orderitem_set.count }}</td>
+                                <td>₹{{ order.total_price }}</td>
+                                <td>
+                                    {% if order.status == 'pending' %}
+                                        <span class="badge bg-warning">{{ order.get_status_display }}</span>
+                                    {% elif order.status == 'confirmed' %}
+                                        <span class="badge bg-info">{{ order.get_status_display }}</span>
+                                    {% elif order.status == 'delivered' %}
+                                        <span class="badge bg-success">{{ order.get_status_display }}</span>
+                                    {% elif order.status == 'cancelled' %}
+                                        <span class="badge bg-danger">{{ order.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'food:order_detail' order.id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        {% if order.status == 'delivered' or order.status == 'cancelled' %}
+                                        <form method="post" action="{% url 'food:delete_order' order.id %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove this order?')">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>No orders have been placed yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
