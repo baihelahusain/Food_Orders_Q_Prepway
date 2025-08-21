@@ -103,12 +103,10 @@
                     <h1 class="display-4 fw-bold mb-3">Delicious Food Delivered To Your Door</h1>
                     <p class="lead mb-4">Experience a wide variety of cuisines from the comfort of your home with our quick and reliable delivery service.</p>
                     {% if user.is_authenticated and user.is_superuser %}
-                    {#
                     <div class="d-flex flex-wrap gap-2">
-                        <a href="/food/add/" class="btn btn-primary btn-lg rounded-pill px-4"><i class="fas fa-plus-circle me-2"></i> Add New Item</a>
+                        <a href="https://food-orders-q-prepway.onrender.com/food/add/" class="btn btn-primary btn-lg rounded-pill px-4"><i class="fas fa-plus-circle me-2"></i> Add New Item</a>
                         <a href="/food/all-orders/" class="btn btn-outline-light btn-lg rounded-pill px-4"><i class="fas fa-list-alt me-2"></i> Manage Orders</a>
                     </div>
-                    #}
                     {% else %}
                     <a href="{% url 'food:index' %}" class="btn btn-primary btn-lg rounded-pill px-4">Order Now <i class="fas fa-arrow-right ms-2"></i></a>
                     {% endif %}
@@ -132,7 +130,9 @@
             <div class="row">
                 <div class="col-lg-4 mb-4">
                     <h5 class="mb-3 fw-bold">Food Orders Q</h5>
-                    <p>Bringing delicious food right to your doorstep with quick and reliable service. We partner with the best restaurants to bring you a diverse culinary experience.</p>
+                    <p style="color: white;">
+                        Bringing delicious food right to your doorstep with quick and reliable service.
+                    </p>
                     <div class="d-flex mt-4">
                         <a href="https://github.com/baihelahusain" target="_blank" class="me-3 text-light social-icon"><i class="fab fa-github fa-lg"></i></a>
                         <a href="https://www.linkedin.com/in/baihela-hussain/" target="_blank" class="me-3 text-light social-icon"><i class="fab fa-linkedin fa-lg"></i></a>
